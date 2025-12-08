@@ -1,368 +1,576 @@
-# ML Ollama - End-to-End ML Pipeline
+# ML Project Flow - Complete Documentation
 
-A production-ready, end-to-end machine learning pipeline built with **Clean + Hexagonal Architecture**. Designed for scalability, maintainability, and extensibility.
+## Project Overview
+This is an end-to-end Machine Learning project built with **Clean + Hexagonal Architecture**, supporting multiple data formats and ML models with a complete pipeline from data ingestion to prediction.
 
-## 🌟 Features
+---
 
-- **Multi-Format Data Support**: CSV, TXT, PDF, and scanned PDF (with OCR)
-- **Complete ML Pipeline**: Data ingestion → EDA → Training → Prediction
-- **Clean Architecture**: Separation of concerns with domain, application, infrastructure, and presentation layers
-- **Extensible Design**: Easy to add new data sources, models, or processing steps
-- **Production Ready**: Logging, configuration management, error handling
-- **CLI Interface**: User-friendly command-line interface with rich output
+## 🏗️ Architecture Layers
 
-## 🏗️ Architecture
+### 1. **Domain Layer** (Business Logic Core)
+- **Entities**: Core business objects (DataSource, ProcessedData, TrainedModel, etc.)
+- **Value Objects**: Immutable objects (FileMetadata, DataQuality, etc.)
+- **Repository Interfaces**: Contracts for data access
+- **No Dependencies**: Pure business logic
 
-The project follows **Clean + Hexagonal Architecture** principles:
+### 2. **Application Layer** (Use Cases)
+- **Use Cases**: Orchestrate business workflows
+  - `DataIngestionUseCase`: Data loading and preprocessing
+  - `EDAUseCase`: Exploratory data analysis
+  - `ModelTrainingUseCase`: Model training workflow
+  - `PredictionUseCase`: Prediction workflow
+  - `MLPipelineUseCase`: Complete end-to-end pipeline
+
+### 3. **Infrastructure Layer** (Technical Implementation)
+- **Data Readers**: CSV, TXT, PDF, Scanned PDF (OCR)
+- **Data Processors**: Cleaning, transformation, validation
+- **EDA Analyzer**: Statistical analysis and visualizations
+- **ML Components**: Model trainers, predictors, repository
+- **Configuration**: Settings, logging, dependency injection
+
+### 4. **Presentation Layer** (User Interface)
+- **CLI**: Typer-based command-line interface
+- **Commands**: run-pipeline, ingest, eda, train, predict
+
+---
+
+## 📊 Complete System Flow
 
 ```
-src/
-├── domain/              # Business logic & entities (innermost layer)
-│   ├── entities.py      # Core business objects
-│   ├── repositories.py  # Port interfaces
-│   └── value_objects.py # Immutable domain values
-│
-├── application/         # Use cases & workflows
-│   └── use_cases/       # Business workflows
-│       ├── data_ingestion.py
-│       ├── eda.py
-│       ├── model_training.py
-│       ├── prediction.py
-│       └── ml_pipeline.py
-│
-├── infrastructure/      # External implementations
-│   ├── data_readers/    # File format readers
-│   │   ├── csv_reader.py
-│   │   ├── text_reader.py
-│   │   ├── pdf_reader.py
-│   │   └── scanned_pdf_reader.py
-│   ├── processing/      # Data processing
-│   │   ├── data_processor.py
-│   │   └── eda_analyzer.py
-│   ├── ml/              # ML implementations
-│   │   ├── model_trainer.py
-│   │   ├── predictor.py
-│   │   └── model_repository.py
-│   ├── persistence/     # Data storage
-│   └── config/          # Configuration
-│
-└── presentation/        # User interfaces
-    └── cli.py           # Command-line interface
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER INPUT                               │
+│  (CLI Command / Python Script / Direct API Call)                │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   PRESENTATION LAYER                             │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  CLI Application (src/presentation/cli.py)                │  │
+│  │  - Parse arguments                                        │  │
+│  │  - Validate inputs                                        │  │
+│  │  - Initialize container                                   │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   APPLICATION LAYER                              │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  Use Case Selection:                                      │  │
+│  │  ┌────────────────┐  ┌────────────────┐                  │  │
+│  │  │ ML Pipeline UC │  │ Data Ingest UC │                  │  │
+│  │  └────────────────┘  └────────────────┘                  │  │
+│  │  ┌────────────────┐  ┌────────────────┐                  │  │
+│  │  │   EDA UC       │  │  Training UC   │                  │  │
+│  │  └────────────────┘  └────────────────┘                  │  │
+│  │  ┌────────────────┐                                       │  │
+│  │  │ Prediction UC  │                                       │  │
+│  │  └────────────────┘                                       │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   INFRASTRUCTURE LAYER                           │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  Data Processing Pipeline:                                │  │
+│  │                                                            │  │
+│  │  [Reader] → [Processor] → [Analyzer] → [Trainer/Predictor]│  │
+│  │                                                            │  │
+│  │  Components:                                              │  │
+│  │  • Data Readers (CSV, TXT, PDF, PDF+OCR)                 │  │
+│  │  • Data Processor (Clean, Transform, Validate)           │  │
+│  │  • EDA Analyzer (Statistics, Visualizations)             │  │
+│  │  • Model Trainer (5 ML Models)                           │  │
+│  │  • Predictor (Inference Engine)                          │  │
+│  │  • Repositories (Data, Model Persistence)                │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       DOMAIN LAYER                               │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  Business Entities & Rules:                               │  │
+│  │  • DataSource      • ProcessedData                        │  │
+│  │  • EDAReport       • ModelConfig                          │  │
+│  │  • TrainedModel    • Prediction                           │  │
+│  │                                                            │  │
+│  │  Repository Interfaces (Contracts)                        │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Architecture Principles
+---
 
-- **Dependency Inversion**: Inner layers don't depend on outer layers
-- **Interface Segregation**: Small, focused interfaces
-- **Single Responsibility**: Each module has one clear purpose
-- **Open/Closed**: Easy to extend without modifying existing code
+## 🔄 End-to-End Pipeline Flow (Detailed)
 
-## 📋 Requirements
-
-- Python 3.9+
-- Poetry (for dependency management)
-- Tesseract OCR (for scanned PDF processing)
-
-## 🚀 Installation
-
-### 1. Clone the repository
-
-```powershell
-git clone <repository-url>
-cd ML_Ollama
+```
+START
+  │
+  ├─► [1] DATA PREPARATION
+  │    │
+  │    ├─ Identify data source (CSV/TXT/PDF/Scanned PDF)
+  │    ├─ Create DataSource entity
+  │    └─ Configure model settings (ModelConfig)
+  │
+  ├─► [2] DATA INGESTION
+  │    │
+  │    ├─ Select appropriate reader
+  │    │   ├─ CSVDataReader
+  │    │   ├─ TextDataReader
+  │    │   ├─ PDFDataReader
+  │    │   └─ ScannedPDFDataReader (with OCR)
+  │    │
+  │    ├─ Read data into DataFrame
+  │    │
+  │    ├─ DATA CLEANING
+  │    │   ├─ Handle missing values
+  │    │   │   ├─ Numeric: Fill with median
+  │    │   │   └─ Categorical: Fill with mode
+  │    │   ├─ Remove duplicates
+  │    │   └─ Handle outliers (optional)
+  │    │
+  │    ├─ DATA TRANSFORMATION
+  │    │   ├─ Identify column types
+  │    │   │   ├─ Numeric columns
+  │    │   │   ├─ Categorical columns
+  │    │   │   └─ Datetime columns
+  │    │   │
+  │    │   ├─ Encode categorical variables
+  │    │   │   └─ Label Encoding (A→0, B→1, C→2)
+  │    │   │
+  │    │   ├─ Scale numeric features (optional)
+  │    │   └─ Parse datetime columns
+  │    │
+  │    ├─ DATA VALIDATION
+  │    │   ├─ Completeness check (missing values %)
+  │    │   ├─ Consistency check (data types)
+  │    │   ├─ Validity check (value ranges)
+  │    │   └─ Generate quality score
+  │    │
+  │    └─ Create ProcessedData entity
+  │
+  ├─► [3] EXPLORATORY DATA ANALYSIS (EDA)
+  │    │
+  │    ├─ Statistical Analysis
+  │    │   ├─ Descriptive statistics
+  │    │   │   ├─ Mean, median, std dev
+  │    │   │   ├─ Min, max, quartiles
+  │    │   │   └─ Count, unique values
+  │    │   │
+  │    │   ├─ Correlation analysis
+  │    │   │   └─ Feature correlations
+  │    │   │
+  │    │   ├─ Outlier detection
+  │    │   │   └─ IQR method
+  │    │   │
+  │    │   └─ Distribution analysis
+  │    │
+  │    ├─ Visualizations
+  │    │   ├─ Distribution plots
+  │    │   │   └─ Histograms for all numeric features
+  │    │   │
+  │    │   ├─ Correlation heatmap
+  │    │   │   └─ Feature correlation matrix
+  │    │   │
+  │    │   └─ Outlier boxplots
+  │    │       └─ Boxplots for numeric features
+  │    │
+  │    ├─ Generate insights
+  │    │   ├─ Dataset size and shape
+  │    │   ├─ Outlier counts per feature
+  │    │   └─ Key patterns detected
+  │    │
+  │    └─ Create EDAReport entity
+  │
+  ├─► [4] MODEL TRAINING
+  │    │
+  │    ├─ Prepare training data
+  │    │   ├─ Select features (X)
+  │    │   ├─ Extract target (y)
+  │    │   └─ Train/test split (80/20)
+  │    │
+  │    ├─ Select ML model
+  │    │   ├─ Linear Regression (regression)
+  │    │   ├─ Logistic Regression (classification)
+  │    │   ├─ Decision Tree (classification/regression)
+  │    │   ├─ Random Forest (classification/regression)
+  │    │   └─ Gradient Boosting (classification/regression)
+  │    │
+  │    ├─ Train model
+  │    │   ├─ Fit model on training data
+  │    │   └─ Apply hyperparameters
+  │    │
+  │    ├─ Evaluate model
+  │    │   ├─ Make predictions on test set
+  │    │   ├─ Calculate metrics
+  │    │   │   ├─ Classification: accuracy, precision, recall, F1
+  │    │   │   └─ Regression: MSE, RMSE, MAE, R²
+  │    │   │
+  │    │   └─ Extract feature importance (if available)
+  │    │
+  │    ├─ Save model
+  │    │   └─ Pickle to .pkl file
+  │    │
+  │    └─ Create TrainedModel entity
+  │
+  ├─► [5] PREDICTION
+  │    │
+  │    ├─ Load trained model from disk
+  │    │
+  │    ├─ Prepare input data
+  │    │   ├─ Select same features as training
+  │    │   ├─ Handle missing values (fill with 0)
+  │    │   └─ Encode categorical variables
+  │    │
+  │    ├─ Make predictions
+  │    │   ├─ Model.predict(X)
+  │    │   └─ Get confidence scores (if classifier)
+  │    │       └─ Model.predict_proba(X)
+  │    │
+  │    ├─ Post-process results
+  │    │   ├─ Attach predictions to original data
+  │    │   ├─ Add confidence scores
+  │    │   └─ Calculate accuracy (if labels available)
+  │    │
+  │    ├─ Save predictions
+  │    │   └─ Export to CSV
+  │    │
+  │    └─ Create Prediction entity
+  │
+  └─► END
+       │
+       └─ Return results to user
 ```
 
-### 2. Install Poetry (if not already installed)
+---
 
-```powershell
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+## 📁 Data Flow Through System
+
+```
+┌─────────────────┐
+│   Raw Data      │
+│  (CSV/TXT/PDF)  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Data Reader    │ ──► Factory Pattern
+│   (Interface)   │     Selects appropriate reader
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   DataFrame     │
+│  (Raw Data)     │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Data Processor  │
+│   - Clean       │ ──► Handle missing, duplicates
+│   - Transform   │ ──► Encode, scale, parse
+│   - Validate    │ ──► Quality checks
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ ProcessedData   │ ──► Entity with metadata
+│   DataFrame +   │     Processing steps
+│   Metadata      │     Quality metrics
+└────────┬────────┘
+         │
+         ├────────────────────┬────────────────────┐
+         ▼                    ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│  EDA Analyzer   │  │ Model Trainer   │  │   Repository    │
+│  - Statistics   │  │  - Split data   │  │   - Save data   │
+│  - Visuals      │  │  - Train model  │  │   - Load data   │
+│  - Insights     │  │  - Evaluate     │  │                 │
+└────────┬────────┘  └────────┬────────┘  └─────────────────┘
+         │                    │
+         ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐
+│   EDAReport     │  │  TrainedModel   │
+│  - Insights     │  │   - Model obj   │
+│  - Statistics   │  │   - Metrics     │
+│  - Visuals path │  │   - Features    │
+└─────────────────┘  └────────┬────────┘
+                              │
+                              ▼
+                     ┌─────────────────┐
+                     │    Predictor    │
+                     │  - Load model   │
+                     │  - Predict      │
+                     │  - Confidence   │
+                     └────────┬────────┘
+                              │
+                              ▼
+                     ┌─────────────────┐
+                     │   Prediction    │
+                     │  - Predictions  │
+                     │  - Confidence   │
+                     │  - Metadata     │
+                     └─────────────────┘
 ```
 
-### 3. Install dependencies
+---
 
-```powershell
-poetry install
+## 🎯 Use Case Execution Flow
+
+### 1. **Data Ingestion Use Case**
+```
+execute(source, clean=True, transform=True)
+  │
+  ├─► Get reader from factory
+  │    └─► reader = factory.get_reader(source.source_type)
+  │
+  ├─► Read data
+  │    └─► raw_data = reader.read(source)
+  │
+  ├─► Clean data (if clean=True)
+  │    ├─► Handle missing values
+  │    ├─► Remove duplicates
+  │    └─► Log cleaning stats
+  │
+  ├─► Transform data (if transform=True)
+  │    ├─► Encode categoricals
+  │    ├─► Scale numerics
+  │    └─► Parse datetimes
+  │
+  ├─► Validate data
+  │    ├─► Check completeness
+  │    ├─► Check consistency
+  │    └─► Calculate quality score
+  │
+  └─► Return ProcessedData entity
 ```
 
-### 4. Install Tesseract (for OCR support)
-
-**Windows:**
-Download from: https://github.com/UB-Mannheim/tesseract/wiki
-
-**Linux:**
-```bash
-sudo apt-get install tesseract-ocr
+### 2. **EDA Use Case**
+```
+execute(data, generate_plots=True, output_dir=None)
+  │
+  ├─► Analyze data
+  │    ├─► Calculate statistics
+  │    ├─► Find correlations
+  │    ├─► Detect outliers
+  │    └─► Generate insights
+  │
+  ├─► Generate visualizations (if generate_plots=True)
+  │    ├─► Distribution plots
+  │    ├─► Correlation heatmap
+  │    ├─► Outlier boxplots
+  │    └─► Save to output_dir
+  │
+  └─► Return EDAReport entity
 ```
 
-**macOS:**
-```bash
-brew install tesseract
+### 3. **Model Training Use Case**
+```
+execute(data, config, save_model=True, model_path=None)
+  │
+  ├─► Train model
+  │    ├─► Prepare data (X, y split)
+  │    ├─► Train/test split
+  │    ├─► Fit model
+  │    └─► Evaluate on test set
+  │
+  ├─► Calculate metrics
+  │    ├─► Accuracy, precision, recall (classification)
+  │    └─► MSE, RMSE, R² (regression)
+  │
+  ├─► Extract feature importance
+  │
+  ├─► Save model (if save_model=True)
+  │    └─► repository.save(model, model_path)
+  │
+  └─► Return TrainedModel entity
 ```
 
-### 5. Configure environment
-
-```powershell
-cp .env.example .env
-# Edit .env with your settings
+### 4. **Prediction Use Case**
+```
+execute(data, model_path)
+  │
+  ├─► Load model
+  │    └─► model = repository.load(model_path)
+  │
+  ├─► Prepare features
+  │    ├─► Select same features as training
+  │    ├─► Handle missing values
+  │    └─► Encode categoricals
+  │
+  ├─► Make predictions
+  │    ├─► predictions = model.predict(X)
+  │    └─► confidence = model.predict_proba(X) [if available]
+  │
+  └─► Return Prediction entity
 ```
 
-## 💻 Usage
-
-### Command-Line Interface
-
-#### Run Complete Pipeline
-
-```powershell
-poetry run ml-pipeline run-pipeline data/raw/data.csv --target-column target --model-type random_forest
+### 5. **ML Pipeline Use Case** (End-to-End)
+```
+execute(source, model_config, perform_eda=True, eda_output_dir, model_output_path)
+  │
+  ├─► [Step 1] Data Ingestion
+  │    └─► processed_data = data_ingestion_use_case.execute(source)
+  │
+  ├─► [Step 2] EDA (if perform_eda=True)
+  │    └─► eda_report = eda_use_case.execute(processed_data, output_dir)
+  │
+  ├─► [Step 3] Model Training
+  │    └─► trained_model = training_use_case.execute(processed_data, config)
+  │
+  ├─► [Step 4] Prediction
+  │    └─► predictions = prediction_use_case.execute(data, model_path)
+  │
+  └─► Return complete results dictionary
+       {
+         'processed_data': ProcessedData,
+         'eda_report': EDAReport,
+         'trained_model': TrainedModel,
+         'predictions': Prediction
+       }
 ```
 
-#### Individual Commands
+---
 
-**Data Ingestion:**
-```powershell
-poetry run ml-pipeline ingest data/raw/data.csv --data-type csv --output-path data/processed/data.pkl
+## 🔧 Component Interaction Diagram
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                     CLI Application                          │
+└────────────────────────┬─────────────────────────────────────┘
+                         │
+                         ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   Container (DI)                             │
+│  Creates and injects all dependencies                        │
+└─┬──────────┬──────────┬──────────┬──────────┬────────────────┘
+  │          │          │          │          │
+  ▼          ▼          ▼          ▼          ▼
+┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐
+│ UC1 │  │ UC2 │  │ UC3 │  │ UC4 │  │ UC5 │
+└──┬──┘  └──┬──┘  └──┬──┘  └──┬──┘  └──┬──┘
+   │        │        │        │        │
+   └────────┴────────┴────────┴────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│           Infrastructure Components                          │
+│                                                              │
+│  ┌─────────┐  ┌──────────┐  ┌────────┐  ┌──────────┐      │
+│  │ Readers │  │Processor │  │Analyzer│  │  Trainer │       │
+│  └─────────┘  └──────────┘  └────────┘  └──────────┘       │
+│                                                              │
+│  ┌─────────┐  ┌──────────┐  ┌────────┐                     │
+│  │Predictor│  │Repository│  │ Logger │                      │
+│  └─────────┘  └──────────┘  └────────┘                      │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-**Exploratory Data Analysis:**
-```powershell
-poetry run ml-pipeline eda data/processed/data.pkl --output-dir outputs/eda
-```
+---
 
-**Train Model:**
-```powershell
-poetry run ml-pipeline train data/processed/data.pkl --target-column target --model-type random_forest
-```
+## 🎨 Supported ML Models
 
-**Make Predictions:**
-```powershell
-poetry run ml-pipeline predict models/model.pkl data/raw/new_data.csv
-```
+| Model | Type | Use Case | Key Parameters |
+|-------|------|----------|----------------|
+| **Linear Regression** | Regression | Continuous prediction | - |
+| **Logistic Regression** | Classification | Binary/Multi-class | max_iter, solver, C |
+| **Decision Tree** | Both | Interpretable model | max_depth, min_samples_split |
+| **Random Forest** | Both | Ensemble, robust | n_estimators, max_depth |
+| **Gradient Boosting** | Both | High performance | learning_rate, n_estimators |
 
-### Python API
+---
 
-#### Example: Complete Pipeline
-
-```python
-from pathlib import Path
-from src.domain.entities import DataSource, DataSourceType, ModelConfig
-from src.infrastructure.config.container import Container
-from src.infrastructure.config.settings import get_settings
-
-# Initialize
-settings = get_settings()
-container = Container(settings)
-
-# Create data source
-source = DataSource(
-    source_type=DataSourceType.CSV,
-    path="data/raw/data.csv"
-)
-
-# Configure model
-model_config = ModelConfig(
-    model_type="random_forest",
-    target_column="target",
-    test_size=0.2
-)
-
-# Execute pipeline
-pipeline = container.ml_pipeline_use_case
-results = pipeline.execute(
-    source=source,
-    model_config=model_config,
-    perform_eda=True,
-    eda_output_dir=Path("outputs/eda"),
-    model_output_path=Path("models/model.pkl")
-)
-
-# Access results
-print(f"Model metrics: {results['trained_model'].metrics}")
-```
-
-#### Example: PDF Processing
-
-```python
-from src.domain.entities import DataSource, DataSourceType
-
-source = DataSource(
-    source_type=DataSourceType.PDF,
-    path="data/raw/document.pdf",
-    metadata={"extract_tables": True}
-)
-
-processed_data = container.data_ingestion_use_case.execute(source)
-print(f"Extracted {len(processed_data.data)} pages")
-```
-
-#### Example: OCR Processing
-
-```python
-from src.domain.entities import DataSource, DataSourceType
-
-source = DataSource(
-    source_type=DataSourceType.PDF_SCAN,
-    path="data/raw/scanned.pdf",
-    metadata={"language": "eng", "dpi": 300}
-)
-
-processed_data = container.data_ingestion_use_case.execute(source)
-print(f"OCR confidence: {processed_data.data['ocr_confidence'].mean():.2f}%")
-```
-
-## 📊 Supported Data Formats
-
-| Format | Type | Description |
-|--------|------|-------------|
-| CSV | `csv` | Comma-separated values |
-| TXT | `txt` | Plain text files |
-| PDF | `pdf` | Text-based PDF documents |
-| PDF Scan | `pdf_scan` | Scanned PDF (requires OCR) |
-
-## 🤖 Supported ML Models
-
-| Model | Type | Use Case |
-|-------|------|----------|
-| Linear Regression | `linear_regression` | Regression |
-| Logistic Regression | `logistic_regression` | Classification |
-| Decision Tree | `decision_tree` | Classification/Regression |
-| Random Forest | `random_forest` | Classification/Regression |
-| Gradient Boosting | `gradient_boosting` | Classification/Regression |
-
-## 📁 Project Structure
+## 📦 File Organization
 
 ```
 ML_Ollama/
 ├── src/
-│   ├── domain/              # Business logic
+│   ├── domain/              # Business logic core
+│   │   ├── entities.py      # Business entities
+│   │   ├── repositories.py  # Interface contracts
+│   │   └── value_objects.py # Immutable objects
+│   │
 │   ├── application/         # Use cases
-│   ├── infrastructure/      # Implementations
-│   └── presentation/        # UI (CLI)
-├── examples/                # Example scripts
+│   │   └── use_cases/
+│   │       ├── data_ingestion.py
+│   │       ├── eda.py
+│   │       ├── model_training.py
+│   │       ├── prediction.py
+│   │       └── ml_pipeline.py
+│   │
+│   ├── infrastructure/      # Technical implementations
+│   │   ├── data_readers/    # CSV, TXT, PDF readers
+│   │   ├── processing/      # Data processor, EDA
+│   │   ├── ml/              # Models, predictor
+│   │   ├── persistence/     # Data repository
+│   │   └── config/          # Settings, DI container
+│   │
+│   └── presentation/        # User interfaces
+│       └── cli.py           # Command-line interface
+│
+├── models/                  # Saved trained models (.pkl)
 ├── data/
-│   ├── raw/                 # Raw input data
-│   └── processed/           # Processed data
-├── models/                  # Trained models
-├── outputs/                 # Results & visualizations
-├── logs/                    # Application logs
-├── pyproject.toml          # Poetry configuration
-└── README.md               # This file
+│   ├── raw/                # Original data files
+│   └── processed/          # Cleaned data files
+├── outputs/
+│   ├── eda/                # EDA visualizations
+│   └── predictions/        # Prediction results
+│
+├── scripts/                # Utility scripts
+├── examples/               # Example usage scripts
+└── full_pipeline_*.py      # Complete pipeline scripts
 ```
-
-## 🔧 Configuration
-
-Edit `.env` file:
-
-```env
-# Environment
-ENVIRONMENT=development
-LOG_LEVEL=INFO
-
-# Paths
-DATA_DIR=data
-RAW_DATA_DIR=data/raw
-PROCESSED_DATA_DIR=data/processed
-MODELS_DIR=models
-OUTPUTS_DIR=outputs
-
-# ML Configuration
-RANDOM_SEED=42
-TEST_SIZE=0.2
-DEFAULT_MODEL_TYPE=random_forest
-
-# OCR Configuration
-TESSERACT_PATH=/usr/bin/tesseract
-OCR_LANGUAGE=eng
-```
-
-## 🎯 Key Design Patterns
-
-- **Repository Pattern**: Abstract data access
-- **Factory Pattern**: Create readers dynamically
-- **Dependency Injection**: Loose coupling via container
-- **Use Case Pattern**: Encapsulate business workflows
-- **Strategy Pattern**: Pluggable algorithms
-
-## 🧪 Development
-
-### Run Examples
-
-```powershell
-poetry run python examples/example_csv_pipeline.py
-poetry run python examples/example_pdf_processing.py
-poetry run python examples/example_ocr_processing.py
-poetry run python examples/example_eda.py
-```
-
-### Code Quality
-
-```powershell
-# Format code
-poetry run black src/
-
-# Sort imports
-poetry run isort src/
-
-# Type checking
-poetry run mypy src/
-
-# Linting
-poetry run flake8 src/
-```
-
-## 🎨 EDA Outputs
-
-The EDA module generates:
-
-- Missing values heatmap
-- Distribution plots
-- Correlation matrix
-- Box plots (outlier detection)
-- Categorical distributions
-- Automated insights
-
-## 🔄 Extending the Pipeline
-
-### Add a New Data Reader
-
-```python
-from src.domain.repositories import IDataReader
-
-class MyCustomReader(IDataReader):
-    def can_read(self, source: DataSource) -> bool:
-        # Implementation
-        pass
-    
-    def read(self, source: DataSource) -> pd.DataFrame:
-        # Implementation
-        pass
-
-# Register with factory
-container.data_reader_factory.add_reader(MyCustomReader())
-```
-
-### Add a New Model
-
-Edit `src/infrastructure/ml/model_trainer.py`:
-
-```python
-SUPPORTED_MODELS = {
-    "my_model": MyModelClass,
-    # ... existing models
-}
-```
-
-## 📝 License
-
-MIT License
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow the existing architecture patterns.
-
-## 📧 Contact
-
-For questions or support, please open an issue.
 
 ---
 
-**Built with Clean Architecture for scalability and maintainability** 🚀
+## 🚀 Execution Modes
+
+### **Mode 1: CLI Command**
+```bash
+ml-pipeline run-pipeline data.csv --target-column price --model-type random_forest
+```
+
+### **Mode 2: Python Script**
+```python
+from src.infrastructure.config.container import Container
+pipeline = container.ml_pipeline_use_case
+results = pipeline.execute(source, config)
+```
+
+### **Mode 3: Full Pipeline Script**
+```bash
+python full_pipeline_random_forest.py
+```
+
+---
+
+## 🔍 Key Design Patterns Used
+
+1. **Dependency Injection**: Container manages all dependencies
+2. **Factory Pattern**: Data reader selection based on file type
+3. **Repository Pattern**: Data and model persistence abstraction
+4. **Strategy Pattern**: Different ML models, different readers
+5. **Use Case Pattern**: Business logic orchestration
+6. **Entity Pattern**: Rich domain models
+
+---
+
+## 📈 Quality Assurance
+
+- **Data Quality Metrics**: Completeness, consistency, validity scores
+- **Model Metrics**: Accuracy, precision, recall, F1, MSE, R²
+- **Feature Importance**: Understand model decisions
+- **Logging**: Comprehensive logging at all levels
+- **Validation**: Data quality checks at each step
+
+---
+
+This architecture ensures:
+✅ **Separation of Concerns**: Each layer has single responsibility
+✅ **Testability**: Easy to unit test each component
+✅ **Maintainability**: Changes in one layer don't affect others
+✅ **Scalability**: Easy to add new models, readers, or features
+✅ **Extensibility**: Plugin new components without breaking existing code
