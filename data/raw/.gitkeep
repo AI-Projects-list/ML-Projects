@@ -1,0 +1,9 @@
+# Raw Data Directory
+
+Place your raw data files here.
+
+Supported formats:
+- CSV (*.csv)
+- Text (*.txt)
+- PDF (*.pdf)
+- Scanned PDF (*.pdf with OCR)
